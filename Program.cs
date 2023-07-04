@@ -1,6 +1,7 @@
 using DapperWebAPI.Context;
 using DapperWebAPI.Contracts;
 using DapperWebAPI.Repository;
+using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 
 app.UseHttpsRedirection();
+
+app.UseRouting();
 
 app.UseAuthorization();
 

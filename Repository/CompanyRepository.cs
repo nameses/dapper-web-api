@@ -10,10 +10,12 @@ namespace DapperWebAPI.Repository
     public class CompanyRepository : ICompanyRepository
     {
         private readonly DapperContext _context;
+        private readonly ILogger<CompanyRepository> _logger;
 
-        public CompanyRepository(DapperContext сontext)
+        public CompanyRepository(DapperContext сontext, ILogger<CompanyRepository> logger)
         {
             _context = сontext;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<Company>> GetCompanies()
@@ -22,7 +24,10 @@ namespace DapperWebAPI.Repository
             using (var connection = _context.CreateConnection())
             {
                 var companies = await connection.QueryAsync<Company>(query);
-
+                if (companies is null)
+                    _logger.LogError($"Failed to get all companies from DB");
+                else
+                    _logger.LogInformation($"Successfully get all companies from DB");
                 return companies.ToList();
             }
         }
@@ -33,7 +38,10 @@ namespace DapperWebAPI.Repository
             using (var connection = _context.CreateConnection())
             {
                 var company = await connection.QuerySingleOrDefaultAsync<Company>(query, new { id });
-
+                if (company is null)
+                    _logger.LogError($"Failed to load company(ID {id}) from DB");
+                else
+                    _logger.LogInformation($"Successfully get company(ID {id}) from DB");
                 return company;
             }
         }
@@ -84,7 +92,8 @@ namespace DapperWebAPI.Repository
 
             using (var connection = _context.CreateConnection())
             {
-                await connection.ExecuteAsync(query, new { id });
+                var result = await connection.ExecuteAsync(query, new { id });
+                if (result < 1) _logger.LogError($"Failed to delete company(ID {id}) from DB");
             }
         }
 
@@ -98,6 +107,11 @@ namespace DapperWebAPI.Repository
             {
                 var company = await connection.QueryFirstOrDefaultAsync<Company>
                     (procedureName, parameters, commandType: System.Data.CommandType.StoredProcedure);
+
+                if (company is null)
+                    _logger.LogError($"Failed to get company by employee ID {id} from DB");
+                else
+                    _logger.LogInformation($"Successfully get company by employee ID {id} from DB");
 
                 return company;
             }
@@ -114,6 +128,11 @@ namespace DapperWebAPI.Repository
                 var company = await multi.ReadSingleOrDefaultAsync<Company>();
                 if (company is not null)
                     company.Employees = (await multi.ReadAsync<Employee>()).ToList();
+
+                if (company is null)
+                    _logger.LogError($"Failed to get company(ID {id}) from DB");
+                else
+                    _logger.LogInformation($"Successfully get company(ID {id}) from DB");
 
                 return company;
             }
@@ -144,6 +163,7 @@ namespace DapperWebAPI.Repository
                 return companies.Distinct().ToList();
             }
         }
+
         public async Task CreateMultipleCompanies(List<CompanyDto> companies)
         {
             var query = "INSERT INTO Company (Name, Address, Country) VALUES (@Name, @Address, @Country)";
