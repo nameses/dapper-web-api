@@ -5,7 +5,7 @@ namespace DapperWebAPI.Contracts
 {
     public interface ICompanyRepository
     {
-        public Task<IEnumerable<Company>> GetCompanies();
+        public Task<List<Company>> GetCompanies();
 
         public Task<Company> GetCompany(int id);
 
@@ -20,6 +20,7 @@ namespace DapperWebAPI.Contracts
         public Task<Company> GetMultipleResults(int id);
 
         public Task<List<Company>> MultipleMapping();
+
         public Task CreateMultipleCompanies(List<CompanyDto> companies);
     }
 }

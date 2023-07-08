@@ -1,6 +1,7 @@
 ﻿using DapperWebAPI.Contracts;
 using DapperWebAPI.Dto;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace DapperWebAPI.Controllers
 {
@@ -18,6 +19,7 @@ namespace DapperWebAPI.Controllers
         }
 
         [HttpGet]
+        [OutputCache]
         public async Task<IActionResult> GetCompanies()
         {
             _logger.Log(LogLevel.Information, $"Request {HttpContext.Request?.Method}: {HttpContext.Request?.Path.Value}");
@@ -27,6 +29,7 @@ namespace DapperWebAPI.Controllers
         }
 
         [HttpGet("{id}", Name = "CompanyById")]
+        [OutputCache(PolicyName = "ShortCache")]
         public async Task<IActionResult> GetCompany(int id)
         {
             _logger.Log(LogLevel.Information, $"Request {HttpContext.Request?.Method}: {HttpContext.Request?.Path.Value}");
@@ -81,6 +84,7 @@ namespace DapperWebAPI.Controllers
         }
 
         [HttpGet("ByEmployeeId/{id}")]
+        [OutputCache]
         public async Task<IActionResult> GetCompanyForEmployee(int id)
         {
             _logger.Log(LogLevel.Information, $"Request {HttpContext.Request?.Method}: {HttpContext.Request?.Path.Value}");
@@ -95,6 +99,7 @@ namespace DapperWebAPI.Controllers
         }
 
         [HttpGet("{id}/MultipleResult")]
+        [OutputCache]
         public async Task<IActionResult> GetMultipleResults(int id)
         {
             _logger.Log(LogLevel.Information, $"Request {HttpContext.Request?.Method}: {HttpContext.Request?.Path.Value}");
@@ -109,6 +114,7 @@ namespace DapperWebAPI.Controllers
         }
 
         [HttpGet("MultipleMapping")]
+        [OutputCache]
         public async Task<IActionResult> GetMultipleMapping()
         {
             _logger.Log(LogLevel.Information, $"Request {HttpContext.Request?.Method}: {HttpContext.Request?.Path.Value}");
